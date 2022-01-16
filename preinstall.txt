@@ -1,2 +1,3 @@
 npm install -D tailwindcss postcss autoprefixer
 npm install web3 @metamask/detect-provider
+npm install swr

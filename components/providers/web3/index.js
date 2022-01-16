@@ -1,5 +1,6 @@
 import detectEthereumProvider from "@metamask/detect-provider";
 import Web3 from "web3";
+import { setupHooks } from "./hooks/setupHooks";
 
 const {
   createContext,
@@ -38,12 +39,16 @@ export default function Web3Provider({ children }) {
   }, []);
 
   const _web3Api = useMemo(() => {
+    const { web3, provider } = web3Api;
     return {
       ...web3Api,
-      connect: web3Api.provider
+      isWeb3Loaded: web3 != null,
+
+      getHooks: () => setupHooks(web3, provider),
+      connect: provider
         ? async () => {
             try {
-              await web3Api.provider.request({ method: "eth_requestAccounts" });
+              await provider.request({ method: "eth_requestAccounts" });
             } catch (error) {
               location.reload();
             }
@@ -62,4 +67,10 @@ export default function Web3Provider({ children }) {
 
 export function useWeb3() {
   return useContext(Web3Context);
+}
+
+export function useHooks(cb) {
+  const { getHooks } = useWeb3();
+
+  return cb(getHooks());
 }
